@@ -69,28 +69,4 @@ namespace Algebra
             return string.Format("({0}/{1})", Numerator, Denominator);
         }
     }
-
-    public class Test
-    {
-        public static void Main(string[] args)
-        {
-            if (args.Length < 2)
-                return;
-            int a,b;
-            if (!(int.TryParse(args[0], out a) && int.TryParse(args[1], out b)))
-            {
-                Console.Error.WriteLine("can't parse args as ints");
-                return;
-            }
-            try
-            {
-                Rational q = new Rational(a,b);
-                Console.WriteLine(q / (new Rational(2)));
-            }
-            catch (Exception e)
-            {
-                Console.Error.WriteLine(e.Message);
-            }
-        }
-    }
 }
