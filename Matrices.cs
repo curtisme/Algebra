@@ -36,26 +36,95 @@ namespace Algebra
 
             public override RingElement Add(RingElement el)
             {
-                return this;
+                Matrix<T> B = el as Matrix<T>;
+                if (B == null)
+                    throw new Exception("Ring element cannot be cast as Matrix!");
+                if (B.M != M || B.N != N)
+                    throw new Exception("Invalid dimensions for matrix addition!");
+                T[][] newElements = new T[M][];
+                for (int i=0;i<M;i++)
+                {
+                    newElements[i] = new T[N];
+                    for(int j=0;j<N;j++)
+                        newElements[i][j] = (T)(elements[i][j] + B.GetElement(i,j));
+                }
+                return new Matrix<T>(newElements);
             }
 
             public override RingElement Multiply(RingElement el)
             {
-                return this;
+                Matrix<T> B = el as Matrix<T>;
+                if (B == null)
+                    throw new Exception("Ring element cannot be cast as Matrix!");
+                if (N != B.M)
+                    throw new Exception("Invalid dimensions for matrix multiplication!");
+                T[][] newElements = new T[M][];
+                for (int i=0;i<M;i++)
+                {
+                    newElements[i] = new T[B.N];
+                    for (int j=0;j<B.N;j++)
+                    {
+                        RingElement sum = elements[0][0].Zero();
+                        for (int k=0;k<N;k++)
+                            sum += elements[i][k] * B.GetElement(k,j);
+                        newElements[i][j] = (T)sum;
+                    }
+                }
+                return new Matrix<T>(newElements);
             }
 
             public override RingElement GetAdditiveInverse()
             {
-                return this;
+                return new Matrix<T>(elements.Select(x =>
+                            x.Select(y =>
+                                (T)y.GetAdditiveInverse()
+                                ).ToArray()
+                            ).ToArray());
+            }
+
+            public override RingElement Zero()
+            {
+                T[][] zeros = new T[M][];
+                for (int i=0;i<M;i++)
+                {
+                    zeros[i] = new T[N];
+                    for(int j=0;j<N;j++)
+                        zeros[i][j] = (T)elements[0][0].Zero();
+                }
+                return new Matrix<T>(zeros);
+            }
+
+            public override RingElement Copy()
+            {
+                return new Matrix<T>(CopyElementsArray());
             }
 
             public Matrix<T> ScalarMultiply(T el)
             {
                 return new Matrix<T>(elements.Select(x =>
                             x.Select(y =>
-                                el*y as T
+                                (T)(el*y)
                                 ).ToArray()
                             ).ToArray());
+            }
+
+            public T GetElement(int i, int j)
+            {
+                if (!(i < M && j < N))
+                    throw new Exception("Matrix coordinates out of bounds!");
+                return elements[i][j];
+            }
+
+            protected T[][] CopyElementsArray()
+            {
+                T[][] copy = new T[M][];
+                for (int i=0;i<M;i++)
+                {
+                    copy[i] = new T[N];
+                    for (int j=0;j<N;j++)
+                        copy[i][j] = (T)elements[i][j].Copy();
+                }
+                return copy;
             }
 
             public override string ToString()
@@ -73,6 +142,21 @@ namespace Algebra
     public class MatrixOverField<T> : Matrix<T>
         where T : FieldElement
         {
+            public MatrixOverField(T[][] elements) : base(elements) {}
+
+            public MatrixOverField<T> GetRREForm()
+            {
+                T[][] newElements = CopyElementsArray();
+                AddRowMultiple(newElements,
+                        (T)(-(newElements[0][0].GetMultiplicativeInverse()*newElements[1][0])), 0, 1);
+                return new MatrixOverField<T>(newElements);
+            }
+
+            private void AddRowMultiple(T[][] matrix, T scalar, int row1, int row2)
+            {
+                for (int i=0;i<N;i++)
+                    matrix[row2][i] = (T)(matrix[row2][i] + scalar*matrix[row1][i]);
+            }
         }
 
     public class Test
@@ -81,11 +165,12 @@ namespace Algebra
         {
             Rational[][] Ts = new Rational[2][]
             {
-                new Rational[2] {new Rational(0), new Rational(1)},
+                new Rational[2] {new Rational(2), new Rational(1)},
                     new Rational[2] {new Rational(1,2), new Rational(0)}
             };
-            Matrix<Rational> M = new Matrix<Rational>(Ts);
-            Console.WriteLine(M.ScalarMultiply(new Rational(2)));
+
+            MatrixOverField<Rational> M = new MatrixOverField<Rational>(Ts);
+            Console.WriteLine(M.GetRREForm());
         }
     }
 }

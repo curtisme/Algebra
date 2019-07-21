@@ -55,11 +55,26 @@ namespace Algebra
             return new Rational(-1*Numerator, Denominator);
         }
 
+        public override RingElement Zero()
+        {
+            return new Rational(0);
+        }
+
+        public override RingElement Copy()
+        {
+            return new Rational(Numerator, Denominator);
+        }
+
         public override FieldElement GetMultiplicativeInverse()
         {
             if (Numerator == 0)
                 throw new Exception("Zero has no multiplicative inverse!");
             return new Rational(Denominator, Numerator);
+        }
+
+        public static implicit operator Rational(int i)
+        {
+            return new Rational(i);
         }
 
         public override string ToString()

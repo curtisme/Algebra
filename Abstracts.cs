@@ -27,6 +27,9 @@ namespace Algebra
         public abstract RingElement Add(RingElement el);
         public abstract RingElement Multiply(RingElement el);
         public abstract RingElement GetAdditiveInverse();
+        public abstract RingElement Zero();
+        public abstract RingElement Copy();
+
     }
 
     public abstract class FieldElement : RingElement
