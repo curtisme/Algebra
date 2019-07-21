@@ -2,7 +2,7 @@ using System;
 
 namespace Algebra
 {
-    public abstract class RingElement
+    public abstract class RingElement : IEquatable<RingElement>
     {
         public static RingElement operator +(RingElement a, RingElement b)
         {
@@ -27,6 +27,7 @@ namespace Algebra
         public abstract RingElement Add(RingElement el);
         public abstract RingElement Multiply(RingElement el);
         public abstract RingElement GetAdditiveInverse();
+        public abstract bool Equals(RingElement el);
         public abstract RingElement Zero();
         public abstract RingElement Copy();
 

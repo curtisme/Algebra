@@ -55,6 +55,14 @@ namespace Algebra
             return new Rational(-1*Numerator, Denominator);
         }
 
+        public override bool Equals(RingElement el)
+        {
+            Rational q = el as Rational;
+            if (q == null)
+                throw new Exception("RingElement cannot be cast as Rational!");
+            return Numerator == q.Numerator && Denominator == q.Denominator;
+        }
+
         public override RingElement Zero()
         {
             return new Rational(0);

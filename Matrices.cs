@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Text;
+using System.Collections.Generic;
 
 namespace Algebra
 {
@@ -94,6 +95,11 @@ namespace Algebra
                 return new Matrix<T>(zeros);
             }
 
+            public override bool Equals(RingElement el)
+            {
+                return true;
+            }
+
             public override RingElement Copy()
             {
                 return new Matrix<T>(CopyElementsArray());
@@ -147,8 +153,7 @@ namespace Algebra
             public MatrixOverField<T> GetRREForm()
             {
                 T[][] newElements = CopyElementsArray();
-                AddRowMultiple(newElements,
-                        (T)(-(newElements[0][0].GetMultiplicativeInverse()*newElements[1][0])), 0, 1);
+                MultiplyRowByScalar(newElements, newElements[0][0], 1);
                 return new MatrixOverField<T>(newElements);
             }
 
@@ -156,6 +161,35 @@ namespace Algebra
             {
                 for (int i=0;i<N;i++)
                     matrix[row2][i] = (T)(matrix[row2][i] + scalar*matrix[row1][i]);
+            }
+
+            private void MultiplyRowByScalar(T[][] matrix, T scalar, int row)
+            {
+                for(int i=0;i<N;i++)
+                    matrix[row][i] = (T)(scalar*matrix[row][i]);
+            }
+
+            private class NumLeadingZerosComparer : IComparer<T[]>
+            {
+                private int getNumLeadingZeros(T[] array)
+                {
+                    int numZeros = 0;
+                    if (array.Length > 0)
+                    {
+                        T zero = (T)T[0].Zero();
+                        foreach (T thing in array)
+                            if (thing == zero)
+                                numZeros += 1;
+                            else
+                                break;
+                    }
+                    return numZeros;
+                }
+
+                public int Compare(T[] a, T[] b)
+                {
+                    return getNumLeadingZeros(a).CompareTo(getNumLeadingZeros(b));
+                }
             }
         }
 
