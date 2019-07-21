@@ -153,7 +153,7 @@ namespace Algebra
             public MatrixOverField<T> GetRREForm()
             {
                 T[][] newElements = CopyElementsArray();
-                MultiplyRowByScalar(newElements, newElements[0][0], 1);
+		Array.Sort<T[]>(newElements, new NumLeadingZerosComparer());
                 return new MatrixOverField<T>(newElements);
             }
 
@@ -176,9 +176,9 @@ namespace Algebra
                     int numZeros = 0;
                     if (array.Length > 0)
                     {
-                        T zero = (T)T[0].Zero();
+                        T zero = (T)array[0].Zero();
                         foreach (T thing in array)
-                            if (thing == zero)
+                            if (thing.Equals(zero))
                                 numZeros += 1;
                             else
                                 break;
@@ -188,6 +188,8 @@ namespace Algebra
 
                 public int Compare(T[] a, T[] b)
                 {
+                    Console.WriteLine(getNumLeadingZeros(a));
+                    Console.WriteLine(getNumLeadingZeros(b));
                     return getNumLeadingZeros(a).CompareTo(getNumLeadingZeros(b));
                 }
             }
@@ -197,10 +199,11 @@ namespace Algebra
     {
         public static void Main()
         {
-            Rational[][] Ts = new Rational[2][]
+            Rational[][] Ts = new Rational[3][]
             {
-                new Rational[2] {new Rational(2), new Rational(1)},
-                    new Rational[2] {new Rational(1,2), new Rational(0)}
+                new Rational[3] {new Rational(0), new Rational(1),(Rational)2},
+                    new Rational[3] {new Rational(1), new Rational(1),(Rational)1},
+                    new Rational[3] {new Rational(0), new Rational(0),new Rational(45,7)}
             };
 
             MatrixOverField<Rational> M = new MatrixOverField<Rational>(Ts);
